@@ -5,7 +5,7 @@
   font-family: "Poppins", sans-serif;
 }
 body {
-  background-color: #5a20cd;
+  background-color: #824242;
 }
 .container {
   background-color: #1b1b1b;
@@ -34,7 +34,7 @@ button {
   color: #a9a7a7;
 }
 .btn-focus {
-  background-color: #5a20cd;
+  background-color: #824242;
   color: #ffffff;
 }
 .time-btn-container {
