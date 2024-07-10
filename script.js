@@ -2,6 +2,12 @@ let focusButton = document.getElementById("focus");
 let buttons = document.querySelectorAll(".btn");
 let shortBreakButton = document.getElementById("shortbreak");
 let longBreakButton = document.getElementById("longbreak");
+let saveButton = document.getElementById("save");
+let closeButton = document.getElementById("close");
+let settingsButton = document.getElementById("settings");
+let settingsContainer = document.getElementById("settingsContainer");
+let validationMessages = document.getElementById("validationMessages")
+
 let startBtn = document.getElementById("btn-start");
 let reset = document.getElementById("btn-reset");
 let pause = document.getElementById("btn-pause");
@@ -18,25 +24,51 @@ const appendZero = (value) => {
   return value;
 };
 
-reset.addEventListener(
-  "click",
-  (resetTime = () => {
-    pauseTimer();
-    switch (active) {
-      case "long":
-        minCount = 14;
-        break;
-      case "short":
-        minCount = 4;
-        break;
-      default:
-        minCount = 24;
-        break;
-    }
-    count = 59;
+const updateTimer = () => {
+
+ if (active == "focus") {
+  pauseTimer();
+  minCount = defaultFocusTime - 1;
+  count = 59;
+  if (minCount < 10) {
+    time.textContent = '0' + `${minCount + 1}:00`;
+  }
+  else {
     time.textContent = `${minCount + 1}:00`;
-  })
-);
+  }
+ }
+
+ else if (active == "short") {
+  pauseTimer();
+  minCount = defaultShortBreakTime - 1;
+  count = 59;
+  if (minCount < 10) {
+    time.textContent = '0' + `${minCount + 1}:00`;
+  }
+  else {
+    time.textContent = `${minCount + 1}:00`;
+  }
+ }
+
+ else if (active = "long") {
+  pauseTimer();
+  minCount = defaultLongBreakTime - 1;
+  count = 59;
+  if (minCount < 10) {
+    time.textContent = '0' + `${minCount + 1}:00`;
+  }
+  else {
+    time.textContent = `${minCount + 1}:00`;
+  }
+ }
+
+} 
+
+reset.addEventListener(
+  "click", () => {
+    pauseTimer();
+    updateTimer();
+});
 
 const removeFocus = () => {
   buttons.forEach((btn) => {
@@ -44,11 +76,25 @@ const removeFocus = () => {
   });
 };
 
+// Default durations
+let defaultFocusTime = 25;
+let defaultShortBreakTime = 5;
+let defaultLongBreakTime = 15;
+
+// Function to update settings input values
+const updateSettingsInputs = () => {
+  document.getElementById("focusTime").value = defaultFocusTime;
+  document.getElementById("shortBreakTime").value = defaultShortBreakTime;
+  document.getElementById("longBreakTime").value = defaultLongBreakTime;
+
+};
+
 focusButton.addEventListener("click", () => {
+  active = "focus"
   removeFocus();
   focusButton.classList.add("btn-focus");
   pauseTimer();
-  minCount = 24;
+  minCount = defaultFocusTime - 1;
   count = 59;
   time.textContent = `${minCount + 1}:00`;
 });
@@ -58,7 +104,7 @@ shortBreakButton.addEventListener("click", () => {
   removeFocus();
   shortBreakButton.classList.add("btn-focus");
   pauseTimer();
-  minCount = 4;
+  minCount = defaultShortBreakTime - 1;
   count = 59;
   time.textContent = `${appendZero(minCount + 1)}:00`;
 });
@@ -68,9 +114,75 @@ longBreakButton.addEventListener("click", () => {
   removeFocus();
   longBreakButton.classList.add("btn-focus");
   pauseTimer();
-  minCount = 14;
+  minCount = defaultLongBreakTime - 1;
   count = 59;
   time.textContent = `${minCount + 1}:00`;
+});
+
+let visibility = false;
+
+settingsButton.addEventListener("click", () => {
+  active = "settings";
+  removeFocus();
+  settingsButton.classList.add("btn-focus");
+
+  if (visibility === false) {
+    settingsContainer.classList.remove('hide');
+    settingsContainer.classList.add('show');
+    updateSettingsInputs();
+    visibility = true;
+  } 
+  
+  else {
+    settingsContainer.classList.add('hide');
+    settingsContainer.classList.remove('show');
+    visibility = false;
+  }
+});
+
+closeButton.addEventListener("click", () => {
+  settingsContainer.classList.add('hide');
+  settingsContainer.classList.remove('show');
+  validationMessages.classList.add('hide');
+  validationMessages.classList.remove('show');
+  visibility = false;
+});
+
+
+saveButton.addEventListener("click", () => {
+
+  let newFocusTime = parseInt(document.getElementById("focusTime").value);
+  let newShortBreakTime = parseInt(document.getElementById("shortBreakTime").value);
+  let newLongBreakTime = parseInt(document.getElementById("longBreakTime").value);
+
+  // Validate input values
+  if (newFocusTime <= 0 || isNaN(newFocusTime)) {
+    document.getElementById("validationMessages").textContent = "Focus time should be greater than 0 and must be a number.";
+    validationMessages.classList.remove('hide');
+    validationMessages.classList.add('show');
+    return;
+  }
+  if (newShortBreakTime <= 0 || isNaN(newShortBreakTime)) {
+    document.getElementById("validationMessages").textContent = "Short break time should be greater than 0 and must be a number.";
+    validationMessages.classList.remove('hide');
+    validationMessages.classList.add('show');
+    return;
+  }
+  if (newLongBreakTime <= 0 || isNaN(newLongBreakTime)) {
+    document.getElementById("validationMessages").textContent = "Long break time should be greater than 0 and must be a number.";
+    validationMessages.classList.remove('hide');
+    validationMessages.classList.add('show');
+    return;
+  }
+
+  // Clear validation messages if all inputs are valid
+  document.getElementById("validationMessages").textContent = "";
+
+  defaultFocusTime = parseInt(document.getElementById("focusTime").value) || defaultFocusTime;
+  defaultShortBreakTime = parseInt(document.getElementById("shortBreakTime").value) || defaultShortBreakTime;
+  defaultLongBreakTime = parseInt(document.getElementById("longBreakTime").value) || defaultLongBreakTime;
+
+  updateTimer();
 });
 
 pause.addEventListener(
